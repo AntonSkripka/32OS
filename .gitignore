@@ -1,0 +1,14 @@
+build/
+*.bin
+*.elf
+*.o
+
+qemu-vga.log
+serial.log
+
+.vscode/
+.idea/
+*.swp
+*~
+
+opt/

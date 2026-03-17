@@ -58,7 +58,7 @@ Emulator: `qemu-system-x86_64`
 ## Build & Run
 ```Bash
 # Clone the repository
-git clone https://github.com/your-username/32OS.git
+git clone https://github.com/AntonSkripka/32OS.git
 cd 32OS
 
 # Compile the OS image

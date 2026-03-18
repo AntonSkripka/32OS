@@ -50,6 +50,8 @@ ISR_NOERR 29
 ISR_ERR   30 ; #SX Security Exception (ERR)
 ISR_NOERR 31
 
+ISR_NOERR 50
+
 isr_common_stub:
     push rax
     push rbx
@@ -107,3 +109,8 @@ isr_stub_table:
     dq isr%+i
 %assign i i+1
 %endrep
+
+%rep 18 
+    dq 0 
+%endrep
+    dq isr50

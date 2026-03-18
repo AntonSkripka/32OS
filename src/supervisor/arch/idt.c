@@ -32,6 +32,17 @@ const char *exception_messages[] = {
     "Reserved", "Reserved"             // 31
 };
 
+void handle_supervisor_call(struct registers_64 *regs) {
+    uint64_t syscall_num = regs->rax;
+    if (syscall_num == 0x01) {
+        vga_set_color(VGA_LIGHT_GREEN, VGA_BLACK);
+        vga_print("\n[Supervisor] Kernel requested service 0x01\n");
+    } 
+    else if (syscall_num == 0x02) {
+        regs->rax = 0xABCDEF; 
+    }
+}
+
 void idt_set_gate_64(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags, uint8_t ist) {
     idt64[num].base_low  = (uint16_t)(base & 0xFFFF);
     idt64[num].base_mid  = (uint16_t)((base >> 16) & 0xFFFF);
@@ -43,6 +54,10 @@ void idt_set_gate_64(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags, ui
 }
 
 void universal_handler_64(struct registers_64 *regs) {
+    if (regs->int_no == 0x32) {
+        handle_supervisor_call(regs);
+        return;
+    }
     __asm__ volatile("cli");
 
     const uint64_t SUPERVISOR_BOUNDARY = 0x800000;
@@ -120,6 +135,8 @@ void init_idt_64() {
     for (int i = 32; i < 256; i++) {
         idt_set_gate_64(i, 0, 0x08, 0, 0);
     }
+
+    idt_set_gate_64(0x32, isr_stub_table[50], 0x08, 0xEE, 0);
 
     idt_load_64(&idtp64);
 }

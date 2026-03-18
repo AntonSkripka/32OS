@@ -36,7 +36,8 @@ OBJS_SUP_64 = $(BUILD_DIR)/64/src/supervisor/arch/entry.o \
           $(BUILD_DIR)/64/src/supervisor/arch/paging_asm.o \
           $(DRIVERS_OBJS_64)
 
-OBJS_KERN_64 = $(BUILD_DIR)/64/src/kernel/kernel.o \
+OBJS_KERN_64 = $(BUILD_DIR)/64/src/kernel/kernel_entry.o \
+			$(BUILD_DIR)/64/src/kernel/kernel.o \
 			$(DRIVERS_OBJS_64)
 
 

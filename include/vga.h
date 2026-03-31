@@ -27,6 +27,8 @@ void vga_clear();
 void vga_set_color(uint8_t fg, uint8_t bg);
 void vga_putc(char c);
 void vga_print(const char* str);
+void vga_putc_at(uint32_t x, uint32_t y, char c);
+void vga_print_at(uint32_t x, uint32_t y, const char* str);
 void vga_print_hex(uint64_t n);
 void vga_print_center(const char* str, uint32_t y);
 void vga_print_reg_centered(const char* label, uint64_t value, int row, int offset_x);

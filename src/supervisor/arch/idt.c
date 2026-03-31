@@ -1,5 +1,6 @@
 #include "idt.h"
 #include "vga.h"
+#include "timer.h"
 
 struct idt_entry_64 idt64[256];
 struct idt_ptr_64 idtp64;
@@ -37,11 +38,14 @@ void handle_supervisor_call(struct registers_64 *regs) {
     if (syscall_num == 0x01) {
         vga_set_color(VGA_LIGHT_GREEN, VGA_BLACK);
         vga_print("\n[Supervisor] Kernel requested service 0x01\n");
-    } 
-    else if (syscall_num == 0x02) {
-        regs->rax = 0xABCDEF; 
+    } else if (syscall_num == 0x02) {
+        regs->rax = 0xABCDEF;
+    } else if (syscall_num == 0x03) {
+        regs->rax = timer_get_milliseconds();
+        regs->rbx = regs->rax; // duplicate timer value to RBX for monitoring
     }
 }
+
 
 void idt_set_gate_64(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags, uint8_t ist) {
     idt64[num].base_low  = (uint16_t)(base & 0xFFFF);
@@ -53,11 +57,25 @@ void idt_set_gate_64(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags, ui
     idt64[num].reserved  = 0;
 }
 
+extern void apic_timer_interrupt(void);
+
 void universal_handler_64(struct registers_64 *regs) {
+    if (regs->int_no == APIC_TIMER_VECTOR) {
+        apic_timer_interrupt();
+        return;
+    }
+
     if (regs->int_no == 0x32) {
         handle_supervisor_call(regs);
         return;
     }
+
+    if (regs->int_no >= 32) {
+        vga_print("Unhandled IRQ=");
+        vga_print_hex(regs->int_no);
+        vga_print("\n");
+    }
+
     __asm__ volatile("cli");
 
     const uint64_t SUPERVISOR_BOUNDARY = 0x800000;
@@ -133,10 +151,11 @@ void init_idt_64() {
     }
 
     for (int i = 32; i < 256; i++) {
-        idt_set_gate_64(i, 0, 0x08, 0, 0);
+        idt_set_gate_64(i, isr_stub_table[i], 0x08, 0x8E, 0);
     }
 
-    idt_set_gate_64(0x32, isr_stub_table[50], 0x08, 0xEE, 0);
+    idt_set_gate_64(0x32, isr_stub_table[0x32], 0x08, 0xEE, 0);
+    idt_set_gate_64(APIC_TIMER_VECTOR, isr_stub_table[APIC_TIMER_VECTOR], 0x08, 0x8E, 0);
 
     idt_load_64(&idtp64);
 }

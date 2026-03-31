@@ -90,6 +90,19 @@ void vga_putc(char c) {
     }
 }
 
+void vga_putc_at(uint32_t x, uint32_t y, char c) {
+    if (x >= 80 || y >= 25) return;
+    uint16_t attribute = (uint16_t)vga_color << 8;
+    VGA_BUFFER[y * 80 + x] = (uint16_t)c | attribute;
+}
+
+void vga_print_at(uint32_t x, uint32_t y, const char* str) {
+    for (uint32_t i = 0; str[i] != '\0'; i++) {
+        if (x >= 80) break;
+        vga_putc_at(x++, y, str[i]);
+    }
+}
+
 void vga_print_center(const char* str, uint32_t y) {
     uint32_t len = 0;
     while (str[len]) len++;

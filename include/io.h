@@ -8,6 +8,15 @@
 #define PIC2_COMMAND 0xA0
 #define PIC2_DATA    0xA1
 
+#define PIT_TIMER_CHANNEL0 0x40
+#define PIT_COMMAND        0x43
+#define PIT_FREQ           1193182
+
+#define CMOS_ADDRESS 0x70
+#define CMOS_DATA    0x71
+
+#define APIC_DEFAULT_BASE 0xFEE00000
+
 static inline void outb(uint16_t port, uint8_t val) {
     asm volatile ("outb %b0, %w1" : : "a"(val), "Nd"(port));
 }
@@ -27,6 +36,8 @@ static inline void cpu_set_msr(uint32_t msr, uint32_t lo, uint32_t hi) {
 }
 
 #define IOAPIC_BASE 0xFEC00000
+
+#define COM1 0x3F8
 
 static inline void ioapic_write(uint32_t reg, uint32_t data) {
     volatile uint32_t *base = (volatile uint32_t*)IOAPIC_BASE;

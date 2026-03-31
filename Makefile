@@ -12,7 +12,8 @@ ASFLAGS_32 = -f elf32
 CFLAGS_64   = $(CFLAGS_BASE) -m64 -mno-red-zone -mcmodel=small -fno-pic -mno-sse -mno-mmx -mno-80387 -mgeneral-regs-only
 ASFLAGS_64 = -f elf64
 
-DRIVERS_SOURCES = src/drivers/vga.c
+DRIVERS_SOURCES = src/drivers/vga.c \
+				src/drivers/serial.c
 DRIVERS_OBJS_32 = $(patsubst src/%.c, $(BUILD_DIR)/32/src/%.o, $(DRIVERS_SOURCES))
 DRIVERS_OBJS_64 = $(patsubst src/%.c, $(BUILD_DIR)/64/src/%.o, $(DRIVERS_SOURCES))
 
@@ -34,14 +35,13 @@ OBJS_SUP_64 = $(BUILD_DIR)/64/src/supervisor/arch/entry.o \
           $(BUILD_DIR)/64/src/supervisor/arch/idt_asm.o \
 		  $(BUILD_DIR)/64/src/supervisor/arch/paging.o \
           $(BUILD_DIR)/64/src/supervisor/arch/paging_asm.o \
+          $(BUILD_DIR)/64/src/supervisor/arch/apic.o \
+          $(BUILD_DIR)/64/src/supervisor/arch/timer.o \
           $(DRIVERS_OBJS_64)
 
 OBJS_KERN_64 = $(BUILD_DIR)/64/src/kernel/kernel_entry.o \
 			$(BUILD_DIR)/64/src/kernel/kernel.o \
 			$(DRIVERS_OBJS_64)
-
-
-.PHONY: all clean run
 
 all: $(BUILD_DIR)/os_image.elf
 
@@ -83,4 +83,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 run: all
-	$(QEMU) -kernel $(BUILD_DIR)/os_image.elf -serial stdio -d int,cpu_reset -no-reboot
+	$(QEMU) -kernel $(BUILD_DIR)/os_image.elf -serial stdio -d int,cpu -D $(BUILD_DIR)/qemu-exec.log -no-reboot

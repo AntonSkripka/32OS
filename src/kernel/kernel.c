@@ -16,8 +16,10 @@ uint64_t call_32os(uint64_t function) {
 void kernel_main() {
     vga_init();
     vga_print("Hello from kernel\n");
-    call_32os(0x01);
-    uint64_t val = call_32os(0x02);
-    vga_print_hex(val);
-    __asm__("hlt");
+    // call_32os(0x01);
+    // uint64_t val = call_32os(0x02);
+    // vga_print_hex(val);
+    for (;;) {
+        __asm__("hlt");
+    }
 };

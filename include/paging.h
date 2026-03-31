@@ -5,7 +5,9 @@
 
 #define PAGE_PRESENT    (1ULL << 0)
 #define PAGE_WRITE      (1ULL << 1)
-#define PAGE_USER       (1ULL << 2) 
+#define PAGE_USER       (1ULL << 2)
+#define PAGE_PWT        (1ULL << 3)
+#define PAGE_PCD        (1ULL << 4)
 #define PAGE_SIZE_4K    4096
 
 #define PML4_IDX(addr) (((addr) >> 39) & 0x1FF)

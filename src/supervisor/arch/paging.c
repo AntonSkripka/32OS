@@ -1,5 +1,6 @@
 #include "paging.h"
 #include "region_array.h"
+#include "apic.h"
 #define TABLES_PER_REGION 8
 
 __attribute__((section(".paging"), aligned(4096))) 
@@ -52,8 +53,12 @@ void paging_init_static() {
         region_pdpts[r][0] = (uintptr_t)region_pds[r]   | PAGE_PRESENT | PAGE_WRITE | PAGE_USER;
 
         for (uint64_t addr = 0; addr < 0x800000; addr += PAGE_SIZE_4K) {
-            paging_map_region_page(r, addr, addr, PAGE_WRITE); 
+            paging_map_region_page(r, addr, addr, PAGE_WRITE);
         }
+
+        uint64_t apic_virt = APIC_VIRT_BASE;
+        uint64_t apic_phys = APIC_DEFAULT_BASE;
+        paging_map_region_page(r, apic_virt, apic_phys, PAGE_WRITE | PAGE_PCD);
 
         if (region_array[r].status == STATUS_ACTIVE) {
             for (uint64_t off = 0; off < 0x200000; off += PAGE_SIZE_4K) {

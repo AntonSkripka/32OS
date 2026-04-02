@@ -11,10 +11,6 @@ static volatile uint32_t rtc_m = 0;
 static volatile uint32_t rtc_s = 0;
 static volatile uint32_t rtc_subms = 0;
 
-static inline int serial_transmit_empty(void) {
-    return (inb(COM1 + 5) & 0x20) != 0;
-}
-
 static uint8_t cmos_read(uint8_t reg) {
     outb(CMOS_ADDRESS, reg);
     return inb(CMOS_DATA);

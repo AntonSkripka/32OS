@@ -6,29 +6,12 @@
 #include "io.h"
 #include "apic.h"
 #include "timer.h"
+#include "serial.h"
 
 extern uint64_t region_pml4s[MAX_REGIONS][512];
 extern volatile uint32_t *lapic_base;
 
 extern void paging_flush_load(uint64_t pml4_phys);
-
-static inline int serial_transmit_empty(void) {
-    return (inb(COM1 + 5) & 0x20) != 0;
-}
-
-static void serial_putc(char c) {
-    while (!serial_transmit_empty());
-    outb(COM1, (uint8_t)c);
-}
-
-static void serial_print(const char *s) {
-    for (uint32_t i = 0; s[i] != '\0'; i++) {
-        if (s[i] == '\n') {
-            serial_putc('\r');
-        }
-        serial_putc(s[i]);
-    }
-}
 
 void supervisor_register_kernel() {
     vga_print("Supervisor: Hardening Memory (4KB Isolation Mode)...\n");

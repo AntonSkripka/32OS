@@ -17,7 +17,7 @@ Hardware Enforcement: If a program attempts to access a single byte outside its 
 2. The Structural Unit: The Region
 In 32OS, there are no "programs" in the classical sense. There are only Regions. A Region is a self-contained vault consisting of:
 
-Tooling (Code): Essential functions (up to 1MB).
+Tooling (Code): Essential functions.
 
 State (Database): Private, encrypted storage for the program’s data. No other Region can read this memory directly.
 
@@ -32,18 +32,8 @@ Transient Databases: Data exchange occurs through temporary, short-lived memory 
 
 One-Time Keys: Access to system resources (like the Task Manager) is granted via dynamic, single-use keys. If intercepted, the key becomes instantly void.
 
-## Current Progress (v0.0.1)
-The system currently boots into a 64-bit environment with a clear separation between the Supervisor and the Kernel.
-
-Multi-boot Compliance: Compatible with GRUB/Limine.
-
-Long Mode Initialization: Successful jump to 64-bit execution.
-
-Supervisor Layer: Active at the 2MB mark with its own dedicated IDT (Interrupt Descriptor Table).
-
-Kernel Layer: Operates at the 8MB mark, communicating through a protected VGA driver.
-
-Hardware Protection: Initial GDT/IDT setup for 64-bit fault handling.
+## Current Progress (v0.0.2-1)
+[CHANGELOG](CHANGELOG.md)
 
 ## Getting Started
 Prerequisites
@@ -64,7 +54,7 @@ cd 32OS
 # Compile the OS image
 make all
 
-### Launch in QEMU
+# Launch in QEMU
 make run
 ```
 ## Security Modes

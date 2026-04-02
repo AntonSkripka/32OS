@@ -7,10 +7,6 @@
 
 volatile uint32_t *lapic_base = (volatile uint32_t *)APIC_VIRT_BASE;
 
-static inline int serial_transmit_empty(void) {
-    return (inb(COM1 + 5) & 0x20) != 0;
-}
-
 static uint32_t apic_timer_ticks_per_ms = 0;
 
 static inline void lapic_write(uint32_t reg, uint32_t value) {

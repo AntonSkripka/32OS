@@ -7,5 +7,6 @@ void serial_init(void);
 void serial_putc(char c);
 void serial_print(const char *s);
 void serial_print_hex(uint64_t v);
+static inline int serial_is_transmit_empty();
 
 #endif

@@ -4,7 +4,7 @@ extern kernel_main
 
 section .text
 _start:
-    mov rsp, 0x900000
+    mov rsp, 0xFFFFFFFF80900000
     and rsp, -16
     call kernel_main
 

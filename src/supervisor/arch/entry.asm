@@ -3,9 +3,9 @@ section .text
 
 global long_mode_entry
 extern supervisor_64_main
+extern kernel_stack_top
 
 long_mode_entry:
-    
     mov ax, 0x10
     mov ds, ax
     mov es, ax
@@ -17,15 +17,17 @@ long_mode_entry:
     and ax, 0xFFFB      
     or ax, 0x2          
     mov cr0, rax
-
     mov rax, cr4
     or ax, (3 << 9)    
     mov cr4, rax
 
-    extern kernel_stack_top
     mov rsp, kernel_stack_top
     and rsp, -16         
- 
+    
+    mov rax, .higher_half
+    jmp rax
+
+.higher_half:
     call supervisor_64_main
 
 .halt:

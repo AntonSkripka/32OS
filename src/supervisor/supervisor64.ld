@@ -1,11 +1,14 @@
 OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(long_mode_entry)
 
+PH_BASE = 2M;
+VM_OFFSET = 0xFFFFFFFF80000000;
+
 SECTIONS
 {
-    . = 2M;
+    . = VM_OFFSET + PH_BASE;
 
-    .text : AT(0)
+    .text : AT(PH_BASE)
     {
         _code_start = .;
         *(.text .text.*)
@@ -13,7 +16,7 @@ SECTIONS
         _code_end = .;
     }
 
-    .rodata : AT(LOADADDR(.text) + SIZEOF(.text))
+    .rodata : AT(ADDR(.rodata) - VM_OFFSET)
     {
         _rodata_start = .;
         *(.rodata .rodata.*)
@@ -21,7 +24,7 @@ SECTIONS
         _rodata_end = .;
     }
 
-    .data : AT(LOADADDR(.rodata) + SIZEOF(.rodata))
+    .data : AT(ADDR(.data) - VM_OFFSET)
     {
         _data_start = .;
         *(.data .data.*)
@@ -29,7 +32,7 @@ SECTIONS
         _data_end = .;
     }
 
-    .bss : AT(LOADADDR(.data) + SIZEOF(.data))
+    .bss : AT(ADDR(.bss) - VM_OFFSET)
     {
         _bss_start = .;
         *(.bss .bss.*)
@@ -38,20 +41,18 @@ SECTIONS
         _bss_end = .;
     }
 
-    . = ALIGN(4096);
-    .paging (NOLOAD) : 
+    .paging (ALIGN(4096)) : AT(ADDR(.paging) - VM_OFFSET)
     {
         *(.paging)
     }
 
-    . = ALIGN(4096);
-    .region_array (NOLOAD) : 
+    .region_array (ALIGN(4096)) : AT(ADDR(.region_array) - VM_OFFSET)
     {
         *(.region_array) 
     }
 
-    _supervisor_end = .;
-    ASSERT(. <= 8M, "Supervisor segment too large and overlaps Kernel!")
+    _supervisor_end_phys = . - VM_OFFSET;
+    ASSERT(_supervisor_end_phys <= 8M, "Supervisor segment too large and overlaps Kernel!")
 
     /DISCARD/ : { *(.comment) *(.eh_frame) }
 }

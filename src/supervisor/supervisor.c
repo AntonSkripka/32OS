@@ -17,14 +17,13 @@ void supervisor_register_kernel() {
     vga_print("Supervisor: Hardening Memory (4KB Isolation Mode)...\n");
 
     uint32_t kernel_id = 0;
-    uint32_t code_start  = 0x800000; 
-    uint32_t state_start = 0xB00000;
-    uint32_t state_limit = 0x100000;
 
     region_init_all(); 
-    region_array[kernel_id].access_key = 0xABCDE001;
+    vga_print("region init static+\n");
     paging_init_static();
-    paging_flush_load((uint64_t)&region_pml4s[kernel_id]);
+    vga_print("paging init static+\n");
+    uint64_t pml4_phys = (uintptr_t)&region_pml4s[kernel_id] - 0xFFFFFFFF80000000ULL;
+    paging_flush_load(pml4_phys);
     
     vga_print("Supervisor: Paging updated. Region 0 is now isolated.\n");
 }
@@ -53,8 +52,8 @@ void supervisor_64_main() {
     __asm__("sti"); // Enable interrupts after APIC is initialized and PIC disabled
     serial_print("after sti\n");
 
-    vga_print("Stage 2: Launching Kernel at 0x800000...\n");
+    vga_print("Stage 2: Launching Kernel at 0xFFFFFFFF80800000...\n");
 
-    void (*kernel_entry)() = (void (*)())0x800000;
+    void (*kernel_entry)() = (void (*)())0xFFFFFFFF80800000;
     kernel_entry();
 }

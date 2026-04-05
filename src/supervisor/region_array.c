@@ -10,9 +10,9 @@ void region_init_all(void) {
     }
 
     region_array[0].status     = STATUS_ACTIVE;
-    region_array[0].code_base  = 0x800000;
-    region_array[0].state_base = 0xE00000; 
-    region_array[0].state_limit = 0x200000;
+    region_array[0].code_base  = 0xFFFFFFFF80800000;
+    region_array[0].state_base = 0xFFFFFFFF80E00000; 
+    region_array[0].state_limit = 0xFFFFFFFF80200000;
     region_array[0].access_key  = 0xABCDE001;
 }
 

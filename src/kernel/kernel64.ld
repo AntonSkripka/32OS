@@ -1,11 +1,14 @@
 OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(kernel_main)
 
+PH_BASE = 8M;
+VM_OFFSET = 0xFFFFFFFF80000000;
+
 SECTIONS
 {
-    . = 8M;
+    . = VM_OFFSET + PH_BASE;
 
-    .text : AT(0)
+    .text : AT(PH_BASE)
     {
         _code_start = .;
         *(.text .text.*)
@@ -13,7 +16,7 @@ SECTIONS
         _code_end = .;
     }
 
-    .rodata : AT(LOADADDR(.text) + SIZEOF(.text))
+    .rodata : AT(ADDR(.rodata) - VM_OFFSET)
     {
         _rodata_start = .;
         *(.rodata .rodata.*)
@@ -21,7 +24,7 @@ SECTIONS
         _rodata_end = .;
     }
 
-    .data : AT(LOADADDR(.rodata) + SIZEOF(.rodata))
+    .data : AT(ADDR(.data) - VM_OFFSET)
     {
         _data_start = .;
         *(.data .data.*)
@@ -29,7 +32,7 @@ SECTIONS
         _data_end = .;
     }
 
-    .bss : AT(LOADADDR(.data) + SIZEOF(.data))
+    .bss : AT(ADDR(.bss) - VM_OFFSET)
     {
         _bss_start = .;
         *(.bss .bss.*)

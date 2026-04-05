@@ -1,7 +1,7 @@
 #include "vga.h"
 #include "io.h"
 
-static uint16_t* const VGA_BUFFER = (uint16_t*)0xB8000;
+static uint16_t* const VGA_BUFFER = (uint16_t*)(0xFFFFFFFF80000000ULL + 0xB8000);
 static uint32_t vga_row = 0;
 static uint32_t vga_column = 0;
 static uint8_t  vga_color = 0x07;

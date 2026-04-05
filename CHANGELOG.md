@@ -22,3 +22,14 @@ Created CHANGELOG.md to track version history.
 
 Fixed
 Code Refactoring: Eliminated redundant and duplicated code across the kernel source to improve maintainability and reduce binary size.
+
+## V. 0.0.2-2 - 2026-04-05
+### Added
+- **Higher Half Kernel Mapping:** The kernel is now fully mapped to the virtual address space starting at `0xFFFFFFFF80000000`.
+- **Per-Region Paging:** Implemented unique PML4 structures for different memory regions to isolate kernel and user spaces.
+- **Strict MMIO Policies:** Explicitly applied `PAGE_PCD` (Cache Disable) and `PAGE_PWT` (Write-Through) flags to APIC memory regions.
+
+### Changed
+- **Bootstrapping:** Updated the 64-bit transition logic (trampoline) to perform a long jump into the higher half virtual address space.
+- **Stack Relocation:** Moved the initial kernel stack to high memory addresses to prevent Page Faults during the transition.
+- **APIC Mapping:** Relocated Local APIC registers to the kernel's device memory range.

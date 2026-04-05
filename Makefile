@@ -9,7 +9,7 @@ BUILD_DIR = build
 CFLAGS_BASE = -ffreestanding -fno-stack-protector -fno-pie -O2 -Wall -Iinclude
 CFLAGS_32   = $(CFLAGS_BASE) -m32 -fno-pic -fcf-protection=none -mno-sse -mno-mmx
 ASFLAGS_32 = -f elf32
-CFLAGS_64   = $(CFLAGS_BASE) -m64 -mno-red-zone -mcmodel=small -fno-pic -mno-sse -mno-mmx -mno-80387 -mgeneral-regs-only
+CFLAGS_64   = $(CFLAGS_BASE) -m64 -mno-red-zone -mcmodel=kernel -fno-pic -mno-sse -mno-mmx -mno-80387 -mgeneral-regs-only
 ASFLAGS_64 = -f elf64
 
 DRIVERS_SOURCES = src/drivers/vga.c \
@@ -23,8 +23,7 @@ BUNDLE_OBJS = $(BUILD_DIR)/32/bundles/supervisor64_bundle.o \
 OBJS_BOOT_32 = $(BUILD_DIR)/32/src/boot/boot.o \
 		  $(BUILD_DIR)/32/src/boot/supervisor32.o \
           $(BUILD_DIR)/32/src/boot/gdt_init.o \
-		  $(BUILD_DIR)/32/src/boot/jump.o \
-          $(DRIVERS_OBJS_32)
+		  $(BUILD_DIR)/32/src/boot/jump.o 
 
 OBJS_SUP_64 = $(BUILD_DIR)/64/src/supervisor/arch/entry.o \
 		  $(BUILD_DIR)/64/src/supervisor/supervisor.o \
@@ -83,4 +82,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 run: all
-	$(QEMU) -kernel $(BUILD_DIR)/os_image.elf -serial stdio -d int,cpu -D $(BUILD_DIR)/qemu-exec.log -no-reboot
+	$(QEMU) -kernel $(BUILD_DIR)/os_image.elf -serial stdio -d int -D $(BUILD_DIR)/qemu-exec.log -no-reboot

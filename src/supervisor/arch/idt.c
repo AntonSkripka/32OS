@@ -86,6 +86,7 @@ void universal_handler_64(struct registers_64 *regs) {
         vga_print_center("!!! SUPERVISOR CRITICAL ERROR !!!", 1);
     } else {
         vga_set_color(VGA_WHITE, VGA_RED);
+        vga_clear();
         vga_print_center("REGION 0 (KERNEL) CRITICAL ERROR", 1);
     }
 

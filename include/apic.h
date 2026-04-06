@@ -25,6 +25,16 @@
 #define LAPIC_TIMER_MODE_ONE_SHOT 0x00000000
 #define LAPIC_TIMER_MODE_PERIODIC 0x00020000
 
+/* I/O APIC Definitions */
+#define IOAPIC_PHYS_BASE  0xFEC00000
+#define IOAPIC_VIRT_BASE  (0xFFFFFFFF80000000ULL + 0x1010000)
+
+/* I/O APIC Register Offsets */
+#define IOAPIC_IOAPICID   0x00
+#define IOAPIC_IOAPICVER  0x01
+#define IOAPIC_IOAPICARB  0x02
+#define IOAPIC_REDTBL     0x10  /* Redirection table base (0x10 - 0x27 for 16+ entries) */
+
 void apic_init(void);
 void apic_disable_legacy_pic(void);
 void apic_timer_start_raw(uint32_t initial_count, uint32_t lvt_flags);
@@ -35,5 +45,9 @@ uint32_t apic_timer_current_count(void);
 
 void apic_set_ticks_per_ms(uint32_t ticks);
 uint32_t apic_get_ticks_per_ms(void);
+
+/* I/O APIC Functions */
+void ioapic_init(void);
+void ioapic_redirect_irq(uint8_t irq, uint8_t vector);
 
 #endif

@@ -13,7 +13,8 @@ CFLAGS_64   = $(CFLAGS_BASE) -m64 -mno-red-zone -mcmodel=kernel -fno-pic -mno-ss
 ASFLAGS_64 = -f elf64
 
 DRIVERS_SOURCES = src/drivers/vga.c \
-				src/drivers/serial.c
+				src/drivers/serial.c \
+				src/drivers/keyboard.c
 DRIVERS_OBJS_32 = $(patsubst src/%.c, $(BUILD_DIR)/32/src/%.o, $(DRIVERS_SOURCES))
 DRIVERS_OBJS_64 = $(patsubst src/%.c, $(BUILD_DIR)/64/src/%.o, $(DRIVERS_SOURCES))
 
@@ -40,6 +41,7 @@ OBJS_SUP_64 = $(BUILD_DIR)/64/src/supervisor/arch/entry.o \
 
 OBJS_KERN_64 = $(BUILD_DIR)/64/src/kernel/kernel_entry.o \
 			$(BUILD_DIR)/64/src/kernel/kernel.o \
+			$(BUILD_DIR)/64/src/supervisor/arch/apic.o \
 			$(DRIVERS_OBJS_64)
 
 all: $(BUILD_DIR)/os_image.elf

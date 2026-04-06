@@ -33,3 +33,11 @@ Code Refactoring: Eliminated redundant and duplicated code across the kernel sou
 - **Bootstrapping:** Updated the 64-bit transition logic (trampoline) to perform a long jump into the higher half virtual address space.
 - **Stack Relocation:** Moved the initial kernel stack to high memory addresses to prevent Page Faults during the transition.
 - **APIC Mapping:** Relocated Local APIC registers to the kernel's device memory range.
+
+## V. 0.0.3 - 2026-04-06
+### Added
+- **IO APIC Support**: Implemented I/O Advanced Programmable Interrupt Controller support for modern interrupt routing, replacing/supplementing the legacy PIC.
+- **PS/2 Keyboard Driver**: Added a robust driver for PS/2 keyboards using interrupt vector 0x41.
+- **Keyboard Layout Engine**:
+Full support for Shift and Caps Lock modifiers (uppercase and special characters).
+Backspace functionality: Implemented smart character deletion that tracks the current input buffer, ensuring it only erases user-typed text and does not overwrite previous logs.

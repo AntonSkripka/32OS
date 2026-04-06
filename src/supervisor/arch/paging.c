@@ -1,6 +1,7 @@
 #include "paging.h"
 #include "region_array.h"
 #include "apic.h"
+#include "io.h"
 
 #define TABLES_PER_REGION 8
 
@@ -91,6 +92,7 @@ void paging_init_static()
         kernel_pd[PD_IDX(APIC_VIRT_BASE)] = kernel_devices_pt_phys | PAGE_PRESENT | PAGE_WRITE | PAGE_PCD | PAGE_PWT;
         kernel_devices_pt[PT_IDX(KERNEL_OFFSET + 0xB8000)] = 0xB8000 | PAGE_PRESENT | PAGE_WRITE;
         kernel_devices_pt[PT_IDX(APIC_VIRT_BASE)] = APIC_DEFAULT_BASE | PAGE_PRESENT | PAGE_WRITE | PAGE_PCD | PAGE_PWT;
+        kernel_devices_pt[PT_IDX(IOAPIC_VIRT_BASE)] = IOAPIC_PHYS_BASE | PAGE_PRESENT | PAGE_WRITE | PAGE_PCD | PAGE_PWT;
     }
 
     for (int r = 0; r < MAX_REGIONS; r++)

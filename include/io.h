@@ -2,6 +2,7 @@
 #define IO_H
 
 #include "types.h"
+#include "apic.h"
 
 #define PIC1_COMMAND 0x20
 #define PIC1_DATA    0x21
@@ -35,20 +36,26 @@ static inline void cpu_set_msr(uint32_t msr, uint32_t lo, uint32_t hi) {
     asm volatile("wrmsr" : : "a"(lo), "d"(hi), "c"(msr));
 }
 
-#define IOAPIC_BASE 0xFEC00000
+/* I/O APIC Physical & Virtual Bases */
+#define IOAPIC_PHYS_BASE  0xFEC00000
+#define IOAPIC_VIRT_BASE  (0xFFFFFFFF80000000ULL + 0x1010000)
+
+/* I/O APIC MMIO Register Indices (in 32-bit words) */
+#define IOAPIC_IOREGSEL   0
+#define IOAPIC_IOWIN      4
 
 #define COM1 0x3F8
 
 static inline void ioapic_write(uint32_t reg, uint32_t data) {
-    volatile uint32_t *base = (volatile uint32_t*)IOAPIC_BASE;
-    base[0] = (reg & 0xFF);      // IOREGSEL
-    base[4] = data;              // IOWIN
+    volatile uint32_t *base = (volatile uint32_t*)IOAPIC_VIRT_BASE;
+    base[IOAPIC_IOREGSEL] = (reg & 0xFF);
+    base[IOAPIC_IOWIN] = data;
 }
 
 static inline uint32_t ioapic_read(uint32_t reg) {
-    volatile uint32_t *base = (volatile uint32_t*)IOAPIC_BASE;
-    base[0] = (reg & 0xFF);
-    return base[4];
+    volatile uint32_t *base = (volatile uint32_t*)IOAPIC_VIRT_BASE;
+    base[IOAPIC_IOREGSEL] = (reg & 0xFF);
+    return base[IOAPIC_IOWIN];
 }
 
 #endif

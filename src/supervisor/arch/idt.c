@@ -1,6 +1,7 @@
 #include "idt.h"
 #include "vga.h"
 #include "timer.h"
+#include "keyboard.h"
 
 struct idt_entry_64 idt64[256];
 struct idt_ptr_64 idtp64;
@@ -42,7 +43,17 @@ void handle_supervisor_call(struct registers_64 *regs) {
         regs->rax = 0xABCDEF;
     } else if (syscall_num == 0x03) {
         regs->rax = timer_get_milliseconds();
-        regs->rbx = regs->rax; // duplicate timer value to RBX for monitoring
+        regs->rbx = regs->rax;
+    } else if (syscall_num == 0x10) {
+        regs->rax = kb_read();
+    } else if (syscall_num == 0x11) {
+        regs->rax = kb_is_empty();
+    } else if (syscall_num == 0x12) {
+        kb_8042_init();
+        regs->rax = 0;
+    } else if (syscall_num == 0x13) {
+        uint8_t scancode = (uint8_t)(regs->rbx & 0xFF);
+        regs->rax = (uint64_t)(unsigned char)scancode_to_ascii(scancode);
     }
 }
 
@@ -58,10 +69,16 @@ void idt_set_gate_64(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags, ui
 }
 
 extern void apic_timer_interrupt(void);
+extern void keyboard_interrupt_handler(struct registers_64 *regs);
 
 void universal_handler_64(struct registers_64 *regs) {
     if (regs->int_no == APIC_TIMER_VECTOR) {
         apic_timer_interrupt();
+        return;
+    }
+
+    if (regs->int_no == 0x41) {
+        keyboard_interrupt_handler(regs);
         return;
     }
 
@@ -78,7 +95,7 @@ void universal_handler_64(struct registers_64 *regs) {
 
     __asm__ volatile("cli");
 
-    const uint64_t SUPERVISOR_BOUNDARY = 0x800000;
+    const uint64_t SUPERVISOR_BOUNDARY = 0xFFFFFFFF80800000;
     vga_clear();
 
     if (regs->rip < SUPERVISOR_BOUNDARY) {
@@ -157,6 +174,7 @@ void init_idt_64() {
 
     idt_set_gate_64(0x32, isr_stub_table[0x32], 0x08, 0xEE, 0);
     idt_set_gate_64(APIC_TIMER_VECTOR, isr_stub_table[APIC_TIMER_VECTOR], 0x08, 0x8E, 0);
+    idt_set_gate_64(0x41, isr_stub_table[0x41], 0x08, 0x8E, 0);
 
     idt_load_64(&idtp64);
 }

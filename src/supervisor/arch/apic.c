@@ -34,7 +34,6 @@ static void apic_map_base(void) {
         base = APIC_DEFAULT_BASE;
     }
 
-    // Ensure APIC is enabled
     lo |= (1 << 11);
     cpu_set_msr(LAPIC_MSR, lo, hi);
 
@@ -125,4 +124,45 @@ void apic_set_ticks_per_ms(uint32_t ticks) {
 
 uint32_t apic_get_ticks_per_ms(void) {
     return apic_timer_ticks_per_ms;
+}
+
+/* ===== I/O APIC Functions ===== */
+
+void ioapic_init(void) {
+    uint32_t ioapic_id = ioapic_read(IOAPIC_IOAPICID);
+    uint32_t ioapic_ver = ioapic_read(IOAPIC_IOAPICVER);
+    
+    serial_print("I/O APIC initialized: ID=");
+    serial_print_hex(ioapic_id >> 24);
+    serial_print(" VER=");
+    serial_print_hex(ioapic_ver & 0xFF);
+    serial_print("\n");
+}
+
+void ioapic_redirect_irq(uint8_t irq, uint8_t vector) {
+    uint32_t redtbl_reg = IOAPIC_REDTBL + irq * 2;
+    uint32_t redtbl_low = ioapic_read(redtbl_reg);
+
+    redtbl_low = (redtbl_low & 0xFFFF0000) | vector;  /* Set vector [0:7] */
+    redtbl_low &= ~(0x7 << 8);                         /* Delivery mode = fixed (000) */
+    redtbl_low &= ~(1 << 11);                          /* Destination mode = physical */
+    redtbl_low &= ~(1 << 13);                          /* Polarity = active high */
+    redtbl_low &= ~(1 << 15);                          /* Trigger = edge */
+    redtbl_low &= ~(1 << 16);                          /* Mask = 0 (enabled) */
+    
+    /* Write back lower 32-bit */
+    ioapic_write(redtbl_reg, redtbl_low);
+    
+    /* Read & write upper 32-bit (destination) */
+    uint32_t redtbl_high = ioapic_read(redtbl_reg + 1);
+    redtbl_high = 0x00000000;  /* 0 */
+    ioapic_write(redtbl_reg + 1, redtbl_high);
+    
+    serial_print("I/O APIC IRQ ");
+    serial_print_hex(irq);
+    serial_print(" redirected to vector 0x");
+    serial_print_hex(vector);
+    serial_print(" (REDTBL=0x");
+    serial_print_hex(redtbl_low);
+    serial_print(")\n");
 }

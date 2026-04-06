@@ -32,7 +32,7 @@ Transient Databases: Data exchange occurs through temporary, short-lived memory 
 
 One-Time Keys: Access to system resources (like the Task Manager) is granted via dynamic, single-use keys. If intercepted, the key becomes instantly void.
 
-## Current Progress (v0.0.2-2)
+## Current Progress (v0.0.3)
 [CHANGELOG](CHANGELOG.md)
 
 ## Getting Started

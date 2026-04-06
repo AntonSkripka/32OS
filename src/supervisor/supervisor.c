@@ -38,10 +38,13 @@ void supervisor_64_main() {
     supervisor_register_kernel();
 
     apic_init();
+    
+    ioapic_init();
+    ioapic_redirect_irq(1, 0x41);
+    
     rtc_init();
     timer_init();
 
-    // Check current count
     extern volatile uint32_t *lapic_base;
     uint32_t curr = lapic_base[LAPIC_REG_TIMER_CURRCNT / 4];
     vga_print("APIC Timer Current Count: ");
@@ -49,7 +52,7 @@ void supervisor_64_main() {
     vga_print("\n");
 
     serial_print("before sti\n");
-    __asm__("sti"); // Enable interrupts after APIC is initialized and PIC disabled
+    __asm__("sti");
     serial_print("after sti\n");
 
     vga_print("Stage 2: Launching Kernel at 0xFFFFFFFF80800000...\n");
